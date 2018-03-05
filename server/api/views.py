@@ -22,13 +22,11 @@ def upload(request):
             serialized_docs.append(serializer.data)
         return Response(serialized_docs)
     elif request.method == 'POST':
-        print request.data
         serializer = DocumentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            print '[x] %s' % serializer.error_messages
             return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
 
 
