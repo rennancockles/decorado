@@ -1,0 +1,2 @@
+# decorado
+decora.do test
