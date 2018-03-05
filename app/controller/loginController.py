@@ -8,9 +8,11 @@ from view import loginView
 
 
 class Main(QtGui.QDialog, loginView.Ui_LoginDialog):
-    def __init__(self, parent=None):
+    def __init__(self, tray, parent=None):
         super(self.__class__, self).__init__(parent)
         self.setupUi(self)
+        self.parent = parent
+        self.tray = tray
 
         self.btn_login.clicked.connect(self.login)
 
@@ -32,4 +34,6 @@ class Main(QtGui.QDialog, loginView.Ui_LoginDialog):
             QtGui.QMessageBox.critical(self, 'Erro', 'Usuário ou senha incorreto!'.decode('utf-8'), QtGui.QMessageBox.Ok)
             return
 
-        QtGui.QMessageBox.critical(self, 'Ok', 'Usuário autenticado!'.decode('utf-8'), QtGui.QMessageBox.Ok)
+        self.tray.show()
+        self.parent.show()
+        self.close()

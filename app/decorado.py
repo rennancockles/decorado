@@ -1,11 +1,6 @@
 #!/usr/bin/python -B
 # -*- coding: utf-8 -*-
 
-# -*- REQUIREMENTS -*-
-# PyQt4 -> apt-get install python-pyqt4
-# requests -> pip install requests
-
-
 import ctypes
 import platform
 import sys
@@ -47,12 +42,13 @@ if __name__ == '__main__':
         libc.prctl(15, 'decorado')
 
     app = QtGui.QApplication(sys.argv)
+
     main = mainController.Main()
-    # main = loginController.Main()
-
     trayIcon = SystemTrayIcon(QtGui.QIcon("docs/icon/decora_512.png"), main)
+    login = loginController.Main(trayIcon, main)
 
-    trayIcon.show()
-    main.show()
+    login.show()
+    trayIcon.hide()
+    main.hide()
 
     sys.exit(app.exec_())
