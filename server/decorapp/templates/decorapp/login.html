@@ -1,0 +1,23 @@
+{% extends "decorapp/header.html" %}
+{% block title %}Login - Decorado{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-1">
+                <h3>Login!</h3>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button class="btn btn-success float-right" type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
