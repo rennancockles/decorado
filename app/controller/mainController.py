@@ -37,9 +37,9 @@ class Upload(QtCore.QThread):
             return
 
         if self.stop_thread:
-            self.setTerminationEnabled(True)
+            self.parent.up_killed = True
+            param.fileobj = None
             self.emit(QtCore.SIGNAL('sigUPDATE(QString)'), '0')
-            self.terminate()
             return
 
         percent = str(current * 100 / total)
@@ -50,7 +50,10 @@ class Upload(QtCore.QThread):
         file = {'docfile': open(self.file['path'], 'rb')}
         datagen, headers = self.multipart_encode_for_requests(file, cb=self.progress)
 
-        r = requests.post(url, data=datagen, headers=headers)
+        try:
+            r = requests.post(url, data=datagen, headers=headers)
+        except AttributeError:
+            return
 
         self.emit(QtCore.SIGNAL('sigUPDATE(QString)'), '100')
 
@@ -62,6 +65,7 @@ class Main(QtGui.QMainWindow, mainView.Ui_MainWindow):
 
         self.file = {}
         self.up_thread = None
+        self.up_killed = False
 
         self.bt_open.clicked.connect(self.open_file)
         self.btn_cancelar.clicked.connect(self.cancelar)
@@ -74,16 +78,19 @@ class Main(QtGui.QMainWindow, mainView.Ui_MainWindow):
         self.lb_filename.clear()
         self.file = {}
         self.up_thread = None
+        if self.up_killed:
+            QtGui.QMessageBox.critical(self, 'Decorado'.decode('utf-8'), 'Upload cancelado', QtGui.QMessageBox.Ok)
 
     def upload(self):
         if not self.file:
-            QtGui.QMessageBox.critical(self, 'Nenhum arquivo selecionado'.decode('utf-8'), 'Selecione um arquivo para fazer upload', QtGui.QMessageBox.Ok)
+            QtGui.QMessageBox.warning(self, 'Nenhum arquivo selecionado'.decode('utf-8'), 'Selecione um arquivo para fazer upload', QtGui.QMessageBox.Ok)
             return
 
         self.up_thread = Upload(parent=self)
         self.connect(self.up_thread, QtCore.SIGNAL('sigUPDATE(QString)'), self.update_progress)
         self.connect(self.up_thread, QtCore.SIGNAL('finished()'), self.thread_done)
         self.up_thread.start()
+        self.up_killed = False
 
     def cancelar(self):
         if self.up_thread:
