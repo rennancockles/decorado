@@ -5,6 +5,7 @@ from poster.encode import multipart_encode
 import requests
 from os import path
 from view import mainView
+from time import time
 
 
 class IterableToFileAdapter(object):
@@ -27,6 +28,7 @@ class Upload(QtCore.QThread):
         self.parent = parent
         self.file = parent.file
         self.stop_thread = False
+        self.start_time = time()
 
     def multipart_encode_for_requests(self, params, boundary=None, cb=None):
         datagen, headers = multipart_encode(params, boundary, cb)
@@ -42,8 +44,29 @@ class Upload(QtCore.QThread):
             self.emit(QtCore.SIGNAL('sigUPDATE(QString)'), '0')
             return
 
+        delta_t = time() - self.start_time
+        tempo_termino = (total * delta_t / current) - delta_t
+        self.emit(QtCore.SIGNAL('sigTIME(QString)'), self.format_time(tempo_termino))
+
         percent = str(current * 100 / total)
         self.emit(QtCore.SIGNAL('sigUPDATE(QString)'), percent)
+
+    def format_time(self, value):
+        value = int(value)
+        if value < 60:
+            horas = 0
+            minutos = 0
+            segundos = value
+        elif value >= 3600:
+            horas = value / 3600
+            minutos = value % 3600 / 60
+            segundos = minutos % 3600 % 60
+        else:
+            horas = 0
+            minutos = value / 60
+            segundos = value % 60
+
+        return "%02d:%02d:%02d" % (horas, minutos, segundos)
 
     def run(self):
         url = 'http://localhost:8000/api/upload'
@@ -74,8 +97,12 @@ class Main(QtGui.QMainWindow, mainView.Ui_MainWindow):
     def update_progress(self, value):
         self.progressBar.setProperty("value", value)
 
+    def update_time(self, value):
+        self.lb_time.setText(value)
+
     def thread_done(self):
         self.lb_filename.clear()
+        self.lb_time.clear()
         self.file = {}
         self.up_thread = None
         if self.up_killed:
@@ -88,6 +115,7 @@ class Main(QtGui.QMainWindow, mainView.Ui_MainWindow):
 
         self.up_thread = Upload(parent=self)
         self.connect(self.up_thread, QtCore.SIGNAL('sigUPDATE(QString)'), self.update_progress)
+        self.connect(self.up_thread, QtCore.SIGNAL('sigTIME(QString)'), self.update_time)
         self.connect(self.up_thread, QtCore.SIGNAL('finished()'), self.thread_done)
         self.up_thread.start()
         self.up_killed = False
@@ -96,6 +124,7 @@ class Main(QtGui.QMainWindow, mainView.Ui_MainWindow):
         if self.up_thread:
             self.up_thread.stop_thread = True
         self.lb_filename.clear()
+        self.lb_time.clear()
         self.progressBar.setProperty("value", 0)
         self.file = {}
 
