@@ -51,7 +51,7 @@ class Ui_MainWindow(object):
         self.bt_open.setIcon(icon)
         self.bt_open.setObjectName(_fromUtf8("bt_open"))
         self.lb_filename = QtGui.QLabel(self.centralwidget)
-        self.lb_filename.setGeometry(QtCore.QRect(280, 120, 171, 30))
+        self.lb_filename.setGeometry(QtCore.QRect(280, 120, 300, 30))
         font = QtGui.QFont()
         font.setPointSize(11)
         self.lb_filename.setFont(font)
