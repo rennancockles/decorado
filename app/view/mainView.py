@@ -87,8 +87,8 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         APP_ICON = QtGui.QIcon()
         BT_ICON = QtGui.QIcon()
-        APP_ICON.addFile(self.resource_path('docs/icon/fav.ico'), QtCore.QSize(60, 60))
-        BT_ICON.addPixmap(QtGui.QPixmap(self.resource_path("docs/icon/open_file.png")), QtGui.QIcon.Normal,
+        APP_ICON.addFile(self.resource_path('../docs/icon/fav.ico'), QtCore.QSize(60, 60))
+        BT_ICON.addPixmap(QtGui.QPixmap(self.resource_path("../docs/icon/open_file.png")), QtGui.QIcon.Normal,
                           QtGui.QIcon.Off)
 
         MainWindow.setWindowTitle(_translate("MainWindow", "Decorado", None))
@@ -111,10 +111,11 @@ class Ui_MainWindow(object):
         self.move(frameGm.topLeft())
 
     def resource_path(self, relative_path):
+        CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
         try:
             base_path = sys._MEIPASS
         except Exception:
-            base_path = ''
+            base_path = CURRENT_PATH
 
         return os.path.join(base_path, relative_path)
 

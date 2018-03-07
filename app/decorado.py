@@ -4,6 +4,7 @@
 import ctypes
 import platform
 import sys
+import os
 from ctypes.util import find_library
 
 from PyQt4 import QtGui, QtCore
@@ -33,7 +34,7 @@ class SystemTrayIcon(QtGui.QSystemTrayIcon):
 
 
 if __name__ == '__main__':
-
+    CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
     if platform.system() == 'Windows':
         myappid = u'cockles.decorado'
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -44,7 +45,8 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
 
     main = mainController.Main()
-    trayIcon = SystemTrayIcon(QtGui.QIcon("docs/icon/decora_512.png"), main)
+    icon_path = os.path.join(CURRENT_PATH, "docs/icon/decora_512.png")
+    trayIcon = SystemTrayIcon(QtGui.QIcon(icon_path), main)
     login = loginController.Main(trayIcon, main)
 
     login.show()
